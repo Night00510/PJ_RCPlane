@@ -1,13 +1,14 @@
-//************ Not the final version In actual use **************//
-
-//************ ไม่ใช่เวอร์ชั่นสุดท้ายที่ใช้จริง **************//
 #include <Arduino.h>
 #include <SPI.h>
 #include <RF24.h>
 #include <stdint.h>
+#include "Data_Stuct.h"
 
 #define CE_PIN 4
 #define CSN_PIN 5
+
+//ตัวแปลส่งกลับ
+PlaneData planeData;
 
 // ตัวแปร RF24L01
 RF24 radio(CE_PIN, CSN_PIN);
