@@ -14,9 +14,11 @@ struct PlaneData {
   int16_t pressure;    // ต้องเอาค่าจริง (float) ×10 แล้วเก็บลงตัวแปร int16_t
 
   int16_t uv;          // UV GUVA เซนเซอร์ดิบ
+  int16_t light;       // ความเข้มแสง
   int16_t battery;     // แบตเตอรี่โวลต์ 
   int16_t height;      // ความสูงเมตร
-  uint8_t checksum;    // เช็คข้อมูลเพี้ยนไหม
+  
+  uint16_t checksum;    // เช็คข้อมูลเพี้ยนไหม
 };
 
 // ขนาดทั้งหมด = 9 ค่า × 2 bytes = 18 bytes
@@ -29,9 +31,10 @@ struct RemoteData {
   int16_t yaw;         // จากจอยสติ๊ก    -1000 → +1000
   int16_t thrust;      // คันเร่ง          0 → 1000
 
-  uint8_t checksum;    // เช็คข้อมูลเพี้ยนไหม
+  uint16_t checksum;    // เช็คข้อมูลเพี้ยนไหม
 };
 
 // ขนาด = 4 × 2 = 8 bytes
 
 #endif //ถ้าใช้ไฟล์นี้แล้ว 1 ครั้ง #ifndef STRUCTS_H จะเป็นเท็จ คอมไพล์จะ ข้ามไฟล์นี้ทั้งไฟล์ทันที
+
