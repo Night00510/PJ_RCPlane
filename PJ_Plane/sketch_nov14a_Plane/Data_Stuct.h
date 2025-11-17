@@ -16,6 +16,7 @@ struct PlaneData {
   int16_t uv;          // UV GUVA เซนเซอร์ดิบ
   int16_t battery;     // แบตเตอรี่โวลต์ 
   int16_t height;      // ความสูงเมตร
+  uint8_t checksum;    // เช็คข้อมูลเพี้ยนไหม
 };
 
 // ขนาดทั้งหมด = 9 ค่า × 2 bytes = 18 bytes
@@ -27,6 +28,8 @@ struct RemoteData {
   int16_t pitch;       // จากจอยสติ๊ก    -1000 → +1000
   int16_t yaw;         // จากจอยสติ๊ก    -1000 → +1000
   int16_t thrust;      // คันเร่ง          0 → 1000
+
+  uint8_t checksum;    // เช็คข้อมูลเพี้ยนไหม
 };
 
 // ขนาด = 4 × 2 = 8 bytes
