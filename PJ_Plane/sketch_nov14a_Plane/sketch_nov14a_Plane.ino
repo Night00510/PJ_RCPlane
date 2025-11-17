@@ -1,3 +1,6 @@
+//************ Not the final version In actual use **************//
+
+//************ ไม่ใช่เวอร์ชั่นสุดท้ายที่ใช้จริง **************//
 #include <Arduino.h>
 #include <SPI.h>
 #include <RF24.h>
