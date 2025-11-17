@@ -1,3 +1,7 @@
+//************ Not the final version In actual use **************//
+
+//************ ไม่ใช่เวอร์ชั่นสุดท้ายที่ใช้จริง **************//
+
 #include <Arduino.h>   // ปกติ include ให้อยู่แล้ว แต่ใส่ไว้ไม่เสียหาย
 #include <Ticker.h>
 #include <SPI.h>
