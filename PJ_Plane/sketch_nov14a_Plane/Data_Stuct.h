@@ -1,3 +1,4 @@
+#include <stddef.h>
 #ifndef DATA_STRUCT_H //ถ้ายังไม่ #define DATA_STRUCT_H ให้ run ต่อ
 #define DATA_STRUCT_H
 
@@ -17,7 +18,7 @@ struct PlaneData {
   int16_t uv;          // UV GUVA เซนเซอร์ดิบ (ค่าจาก ADC)
   int16_t battery;     // แบตเตอรี่โวลต์ ×10 หรือ ×100 ก็ได้
   int16_t height;      // ความสูงเมตร ×10 (ถ้าต้องการละเอียด)
-  uint8_t checksum;   // เช็คข้อมูลเพี้ยนไหม
+  byte checksum;   // เช็คข้อมูลเพี้ยนไหม
 };
 // ขนาด (ไม่คิด padding) =  9 × 2 + 1 bytes = 19 bytes
 
@@ -29,7 +30,7 @@ struct RemoteData {
   int16_t yaw;         // จากจอยสติ๊ก    -1000 → +1000
   int16_t thrust;      // คันเร่ง          0 → 1000
 
-  uint8_t checksum;    // เช็คข้อมูลเพี้ยนไหม
+  byte checksum;    // เช็คข้อมูลเพี้ยนไหม
 };
 // ขนาด (ไม่คิด padding) = 4×2 + 1 = 9 bytes
 
@@ -53,6 +54,9 @@ struct BMP280_Data {
   float humid;        // %
 };
 
+constexpr size_t planeData_Size = sizeof(PlaneData); // นับ checksum ด้วย
+constexpr size_t remodeData_Size = sizeof(RemoteData); // นับ checksum ด้วย 
+                                                      //constexpr เป็นconstที่สร้างตั้งแต่ตอน compile
 void setupMPU();    // ประกาศฟังก์ชันเริ่มต้นเซนเซอร์MPU
 MPU_Data readMPU(); // ฟังก์ชันอ่านค่ามุม
 
