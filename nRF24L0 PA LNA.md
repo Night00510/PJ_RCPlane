@@ -1,0 +1,17 @@
+#nRF24L0 PA LNA Pin
+- nRF ตัวส่ง
+  - CE → pin 4
+  - CSN → pin 5
+  - SCK → SCK (เช่น GPIO18 บน ESP32)
+  - MOSI → MOSI (GPIO23)
+  - MISO → MISO (GPIO19)
+  - VCC → 3.3V
+  - GND → GND
+- nRF ตัวรับ
+  - CE → pin 16
+  - CSN → pin 17
+  - SCK → SCK (ต่อรวมกับตัวส่ง)
+  - MOSI → MOSI (ต่อรวมกับตัวส่ง)
+  - MISO → MISO (ต่อรวมกับตัวส่ง)
+  - VCC → 3.3V
+  - GND → GND
