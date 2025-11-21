@@ -1,6 +1,3 @@
-#include <RF24.h>
-#include "Data_Stuct.h"
-
 // ใช้ radio_Sent / radio_Receive ที่ประกาศอยู่ในไฟล์หลัก (ไม่สร้างซ้ำ)
 extern RF24 radio_Sent;
 extern RF24 radio_Receive;
