@@ -15,7 +15,7 @@ byte doCheckSum(const byte *buf, size_t len)
 
   for (size_t i = 0; i < len; i++)
   {
-    sum ^= buf[i];
+    sum ^= buf[i]; // sum = sum (XRO) buf[i]
   }
 
   return sum;
@@ -104,3 +104,4 @@ bool receive_Remote_Packet(RemoteData &receive_Packet, bool debug)
 
   return true;  // ใช้ได้
 }
+
