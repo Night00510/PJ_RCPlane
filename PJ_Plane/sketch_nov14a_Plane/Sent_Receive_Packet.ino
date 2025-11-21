@@ -1,8 +1,9 @@
 #include <RF24.h>
-#include "Data_Struct.h"
+#include "Data_Stuct.h"
 
-// ใช้ radio_Sent ที่ประกาศอยู่ในไฟล์หลัก (ไม่สร้างซ้ำ)
+// ใช้ radio_Sent / radio_Receive ที่ประกาศอยู่ในไฟล์หลัก (ไม่สร้างซ้ำ)
 extern RF24 radio_Sent;
+extern RF24 radio_Receive;
 
 // ตาราง address ของแต่ละ pipe (0 = REMODE, 1 = PLANE)
 extern const byte pipeAddr[][6];
@@ -10,62 +11,99 @@ extern const byte pipeAddr[][6];
 
 // ============================================
 // ฟังก์ชันคำนวณ checksum แบบ XOR ทีละ byte
-// buf  = pointer ชี้ไปยังข้อมูลจริง
-// len  = จำนวน byte ที่ต้องนำมาคิด
 // ============================================
 byte doCheckSum(const byte *buf, size_t len)
 {
   byte sum = 0;
 
-  // วิ่งอ่านทีละ byte จากหน่วยความจำ
   for (size_t i = 0; i < len; i++)
   {
-    // XOR byte ทุกตัวเข้าด้วยกัน
     sum ^= buf[i];
   }
 
-  // ส่งค่า checksum กลับ
   return sum;
 }
 
 
 // =====================================================
-// ฟังก์ชันส่งข้อมูลผ่าน nRF24
-// sent_Packet = struct PlaneData ที่จะส่ง
-// pipeline    = pipe ที่จะใช้ส่ง (REMODE หรือ PLANE)
+// ฟังก์ชันส่ง PlaneData → ส่งไปที่รีโมทอย่างเดียว
+// debug = true เพื่อเปิดแสดงผลทาง Serial
 // =====================================================
-void sent_Data(PlaneData &sent_Packet, PipeID pipeline)
+void sent_Plane_Data(PlaneData &sent_Packet, const byte *addr, bool debug)
 {
-  // แปลง struct ให้เป็น pointer byte
-  // เพื่อให้ doCheckSum อ่านข้อมูลทุก byte ได้
   const byte *buf = (const byte*)&sent_Packet;
 
-  // คำนวณ checksum จากทุก byte ยกเว้น
-  // byte สุดท้าย (ช่อง checksum เอง)
-  sent_Packet.checksum = doCheckSum(buf, sizeof(PlaneData) - 1);
+  // คำนวณ checksum
+  sent_Packet.checksum = doCheckSum(buf, planeData_Size - 1);
 
-  // เปลี่ยน nRF24 เข้าโหมดส่ง
+  // เข้าโหมดส่ง
   radio_Sent.stopListening();
 
-  // เลือก address ของ pipe ตาม enum ที่ส่งเข้ามา
-  // เช่น REMODE -> pipeAddr[0]
-  //      PLANE  -> pipeAddr[1]
-  radio_Sent.openWritingPipe(pipeAddr[pipeline]);
+  // ใช้ address ที่ส่งเข้ามา
+  radio_Sent.openWritingPipe(addr);
 
-  // ส่ง packet ออกไปจริง ๆ
-  bool ok = radio_Sent.write(&sent_Packet, sizeof(PlaneData));
+  // ส่ง packet ออกไป
+  bool ok = radio_Sent.write(&sent_Packet, planeData_Size);
 
-  // ส่วน debug: แสดงผลว่าส่งสำเร็จหรือไม่
-  #ifdef DEBUG_RADIO
-    if (ok)
-    {
-      Serial.print("Send OK on pipe ");
-      Serial.println(pipeline);
+  // debug runtime เปิด-ปิดได้ตอนเรียกฟังก์ชัน
+  if (debug)
+  {
+    Serial.print("Send ");
+    Serial.print(ok ? "OK" : "FAIL");
+    Serial.print(" to addr = \"");
+
+    // แสดง address เป็นตัวอักษร (เช่น "REM01")
+    for (int i = 0; i < 5; i++) {
+      Serial.write(addr[i]);
     }
-    else
-    {
-      Serial.print("Send FAIL on pipe ");
-      Serial.println(pipeline);
+
+    Serial.print("\" [");
+
+    // แสดง address แบบ HEX ด้วย
+    for (int i = 0; i < 5; i++) {
+      if (i > 0) Serial.print(' ');
+      Serial.print(addr[i], HEX);
     }
-  #endif
+
+    Serial.println("]");
+  }
+}
+
+
+
+// =====================================================
+// รับ RemoteData ← รับจากรีโมททางเดียว
+// debug = true เพื่อเปิดแสดงผลทาง Serial
+// =====================================================
+bool receive_Remote_Packet(RemoteData &receive_Packet, bool debug)
+{
+  // ถ้าไม่มี packet เข้ามาเลย → ออก
+  if (!radio_Receive.available()) {
+    return false;
+  }
+
+  // อ่านข้อมูลออกจาก RX FIFO
+  radio_Receive.read(&receive_Packet, remodeData_Size);
+
+  // แปลง struct เป็น byte*
+  const byte *buf = (const byte *)&receive_Packet;
+
+  // คำนวณ checksum ใหม่
+  byte checksum = doCheckSum(buf, remodeData_Size - 1);
+
+  // ตรวจว่า checksum ตรงไหม
+  if (checksum != receive_Packet.checksum)
+  {
+    if (debug)
+    {
+      Serial.print("Bad checksum, calc = ");
+      Serial.print(checksum);
+      Serial.print(" pkt = ");
+      Serial.println(receive_Packet.checksum);
+    }
+
+    return false;
+  }
+
+  return true;  // ใช้ได้
 }

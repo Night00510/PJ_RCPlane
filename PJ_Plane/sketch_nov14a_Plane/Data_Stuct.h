@@ -59,5 +59,7 @@ constexpr size_t remodeData_Size = sizeof(RemoteData); // นับ checksum ด
                                                       //constexpr เป็นconstที่สร้างตั้งแต่ตอน compile
 void setupMPU();    // ประกาศฟังก์ชันเริ่มต้นเซนเซอร์MPU
 MPU_Data readMPU(); // ฟังก์ชันอ่านค่ามุม
+bool receive_Remote_Packet(RemoteData &receive_Packet, bool debug = false);
+void sent_Plane_Data(PlaneData &sent_Packet, const byte *addr, bool debug = false);
 
 #endif //ถ้าใช้ไฟล์นี้แล้ว 1 ครั้ง #ifndef STRUCTS_H จะเป็นเท็จ คอมไพล์จะข้าม code จนถึง #endif ทันที
