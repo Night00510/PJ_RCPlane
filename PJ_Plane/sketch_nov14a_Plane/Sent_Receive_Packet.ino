@@ -3,7 +3,7 @@
 // extern RF24 radio_Receive;
 
 // ตาราง address ของแต่ละ pipe (0 = REMODE, 1 = PLANE)
-extern const byte pipeAddr[][6];
+// extern const byte pipeAddr[][6];
 
 
 // ============================================
@@ -104,4 +104,5 @@ bool receive_Remote_Packet(RemoteData &receive_Packet, bool debug)
 
   return true;  // ใช้ได้
 }
+
 
