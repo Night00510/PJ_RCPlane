@@ -1,4 +1,4 @@
-extern MPU6050 mpu;
+// extern MPU6050 mpu;
 
 // ฟังก์ชันอ่าน MPU6050 แล้ว return struct MPU_Data
 MPU_Data readMPU(bool debug)

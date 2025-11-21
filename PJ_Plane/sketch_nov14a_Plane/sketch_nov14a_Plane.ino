@@ -4,14 +4,18 @@
   #include <Adafruit_Sensor.h>
   #include <Adafruit_BME280.h>
   #include <DHT.h>
+  #include <BH1750.h>
   #include "Data_Stuct.h"   // <- แก้ชื่อไฟล์ให้ตรงกับจริง
 
-  // ========= nRF24 =====================
   #define CE_TX  4    // ขาส่ง
   #define CSN_TX 5    // ขาส่ง
   #define CE_RX  16   // ขารับ
   #define CSN_RX 17   // ขารับ
 
+  #define DHT_PIN 2
+  #define DHT_TYPE DHT22
+
+  // ========= nRF24 =====================
   enum PipeID { REMODE = 0, PLANE = 1 };
   const byte pipeAddr[][6] = { "REM01" , "PLN01" };
 
@@ -24,15 +28,20 @@
   //===========MPU6050===================
 
   //===========BME280 DHT22====================
-  #define DHT_PIN 2
-  #define DHT_TYPE DHT22
- 
   Adafruit_BME280 bme;
   DHT dht(DHT_PIN, DHT_TYPE);
   //===========BME280 DHT22====================
-  
-  // ตัวแปรเก็บข้อมูลที่รับมา
-  RemoteData rxData;
+
+  //===========GUVA-S12SD====================
+  uint uv_Level = 0;
+  //===========GUVA-S12SD====================
+
+  //===========BH1750====================
+  BH1750 light_Meter;
+  //===========BH1750====================
+
+  RemoteData rxData; // ตัวแปรเก็บข้อมูลที่รับมา
+  PlaneData txData;  // ตัวแปรเก็บข้อมูลที่จะส่ง
 
   void setup()
   {

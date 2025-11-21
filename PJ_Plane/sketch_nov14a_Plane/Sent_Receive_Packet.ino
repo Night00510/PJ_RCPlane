@@ -1,6 +1,6 @@
 // ใช้ radio_Sent / radio_Receive ที่ประกาศอยู่ในไฟล์หลัก (ไม่สร้างซ้ำ)
-extern RF24 radio_Sent;
-extern RF24 radio_Receive;
+// extern RF24 radio_Sent;
+// extern RF24 radio_Receive;
 
 // ตาราง address ของแต่ละ pipe (0 = REMODE, 1 = PLANE)
 extern const byte pipeAddr[][6];

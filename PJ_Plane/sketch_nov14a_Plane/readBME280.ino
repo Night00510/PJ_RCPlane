@@ -1,56 +1,65 @@
-extern Adafruit_BME280 bme;
-extern DHT dht;
+// extern Adafruit_BME280 bme;
+// extern DHT dht;
 
 // กำหนดค่าความกดอากาศ ณ ระดับน้ำทะเล (hPa)
-#define SEALEVELPRESSURE_HPA (1013.25)
+#define SEALEVELPRESSURE (1013.25f)
 
-// -----------------------------------------------------------
-// ฟังก์ชันอ่านค่าเซนเซอร์รวม (คืนค่าเป็น Struct)
-// -----------------------------------------------------------
+// เก็บค่าความดัน "อ้างอิง" จากการอ่านครั้งแรก (hPa)
+static float basePressure_hPa = NAN;
+
+// ฟังก์ชันอ่านข้อมูล
 BMP280_DHT_Data readBME_DHT(bool read_SEALEVEL, bool debug) 
 {
     BMP280_DHT_Data data;
 
-    // A. อ่านค่าจาก BME280/BMP280
-    float temp_C = bme.readTemperature();
-    data.temp = temp_C;
-    data.pressure = bme.readPressure() / 100.00F;
-    if (read_SEALEVEL)
-    {
-      
-    }
-    else
-    {
-      data.height = bme.readAltitude(SEALEVELPRESSURE_HPA);
-    }
-
-    // B. อ่านค่าจาก DHT22 (สำหรับความชื้น)
+    // -----------------------
+    // อ่านจาก DHT22
+    // -----------------------
+    float dht_temp  = dht.readTemperature();
     float dht_humid = dht.readHumidity();
 
-    if (isnan(dht_humid)) {
-        data.humid = 0.0; // ค่า Error
-    } else {
-        data.humid = dht_humid;
+    data.temp_C  = isnan(dht_temp)  ? 0.0f : dht_temp;
+    data.temp_F  = isnan(dht_temp)  ? 0.0f : dht_temp;
+    data.humid = isnan(dht_humid) ? 0.0f : dht_humid;
+
+    // -----------------------
+    // อ่านจาก BME/BMP280
+    // -----------------------
+    float p_hPa = bme.readPressure() / 100.0f;   // จาก Pa → hPa
+    data.pressure = p_hPa;
+
+    // ถ้ายังไม่เคยตั้ง baseline (ครั้งแรกที่เรียกฟังก์ชัน) ถ้ายังไม่เคยเก็บ basePressure_hPa 
+    if (isnan(basePressure_hPa)) 
+    {
+        basePressure_hPa = p_hPa;   // ล็อกค่าความดันตอนนี้ไว้เป็น "ระดับ 0"
     }
 
+    data.height = (read_SEALEVEL) ? bme.readAltitude(SEALEVELPRESSURE) : bme.readAltitude(basePressure_hPa);
+
+    // -----------------------
+    // DEBUG PRINT
+    // -----------------------
     if (debug)
     {
-        Serial.println(F("--- BME280/DHT22 Data ---"));
+        Serial.println(F("--- BME280 + DHT22 Data ---"));
         
-        Serial.print(F("Temp: "));
-        Serial.print(data.temp);
-        Serial.print(F(" C | Press: "));
+        Serial.print(F("Temp (DHT): "));
+        Serial.print(data.temp_C);
+        Serial.print(F(" C | Temp (DHT): "));
+        Serial.print(data.temp_F);
+        Serial.print(F(" F | Humid (DHT): "));
+        Serial.print(data.humid);
+        Serial.print(F(" %"));
+
+        Serial.print(F(" | Pressure: "));
         Serial.print(data.pressure);
         Serial.print(F(" hPa"));
 
-        Serial.print(F(" | Humid: "));
-        Serial.print(data.humid);
-        Serial.print(F(" % | Alt: "));
+        Serial.print(F(" | Altitude: "));
         Serial.print(data.height);
         Serial.println(F(" m"));
-        Serial.println(F("-------------------------"));
+        Serial.println(F("----------------------------"));
     }
     
-    // คืนค่า Struct ที่มีข้อมูลทั้งหมด
     return data;
 }
