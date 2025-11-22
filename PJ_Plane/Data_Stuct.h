@@ -89,32 +89,28 @@ struct BMP280_DHT_Data {
 //
 
 typedef float (*ReadFunc)();   // ฟังก์ชัน pointer สำหรับฟังก์ชันที่คืนค่า float และไม่รับพารามิเตอร์
-typedef float (*ReadFuncPin)(byte); // ฟังก์ชัน pointer สำหรับฟังก์ชันที่คืนค่า float และรับพารามิเตอร์
+
 // constexpr เป็น const ที่คำนวณตั้งแต่ตอน compile
 constexpr size_t planeData_Size  = sizeof(PlaneData);   // ใช้เวลา radio.write / checksum
-constexpr size_t remodeData_Size = sizeof(RemoteData);  // ใช้เวลา radio.read / checksum
+constexpr size_t remoteData_Size = sizeof(RemoteData);  // ใช้เวลา radio.read / checksum
 
 //
 // ===================== Function Prototypes =====================
 //
 
-void     setupMPU();    // ฟังก์ชันเริ่มต้นเซนเซอร์ MPU6050
 MPU_Data read_MPU(bool debug = false); // อ่านมุมจาก MPU6050
 
-bool     receive_Remote_Packet(RemoteData &receive_Packet, bool debug = false);
-void     sent_Plane_Data(PlaneData &sent_Packet, const byte *addr, bool debug = false);
+bool receive_Remote_Packet(RemoteData &receive_Packet, bool debug = false);
+void sent_Plane_Data(PlaneData &sent_Packet, const byte *addr, bool debug = false);
+void Control_Surfaces();
 
 BMP280_DHT_Data readBME_DHT(bool read_SEALEVEL = false, bool debug = false);
 GUVA_BH1750     read_UV_BH1750(byte pin, bool debug = false);
 // float readBH1750(bool debug = false);  // ถ้าจะใช้แยกเฉพาะ BH1750
 
 float avgRead(ReadFunc func, int n);
-float avgRead_Pin(ReadFuncPin func_Pin, int n);
 float readRoll();
 float readPitch();
 float readYaw();
 
 #endif
-
-
-

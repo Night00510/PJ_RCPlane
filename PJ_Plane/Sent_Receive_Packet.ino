@@ -79,14 +79,16 @@ bool receive_Remote_Packet(RemoteData &receive_Packet, bool debug)
     return false;
   }
 
-  // อ่านข้อมูลออกจาก RX FIFO
-  radio_Receive.read(&receive_Packet, remodeData_Size);
-
+  while (radio_Receive.available()) //ถ้ามี packet ค้างในชิปจะอ่าน packet
+  {
+    // อ่านข้อมูลออกจาก RX FIFO 
+    radio_Receive.read(&receive_Packet, remoteData_Size);
+  }
   // แปลง struct เป็น byte*
   const byte *buf = (const byte *)&receive_Packet;
 
   // คำนวณ checksum ใหม่
-  byte checksum = doCheckSum(buf, remodeData_Size - 1);
+  byte checksum = doCheckSum(buf, remoteData_Size - 1);
 
   // ตรวจว่า checksum ตรงไหม
   if (checksum != receive_Packet.checksum)

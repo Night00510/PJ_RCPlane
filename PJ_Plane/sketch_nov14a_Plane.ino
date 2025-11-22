@@ -5,6 +5,7 @@
   #include <Adafruit_BME280.h>
   #include <DHT.h>
   #include <BH1750.h>
+  #include <ESP32Servo.h>
   #include "Data_Stuct.h"   // <- แก้ชื่อไฟล์ให้ตรงกับจริง
 
   #define CE_TX  4    // ขาส่ง
@@ -20,12 +21,23 @@
   #define R1 47.0   // 47kΩ
   #define R2 10.0   // 10kΩ
 
+  #define ROLL_LEFT_SERVO_PIN 12   // Servo ปีกช้าย
+  #define ROLL_RIGHT_SERVO_PIN 13  // Servo ปีกขวา
+  #define PITCH_SERVO_PIN 14       // Servo pitch
+  #define YAW_SERVO_PIN 25         // Servo yaw
+  #define THRUST_PIN 26            // BLDE thust
+  #define WING_UP 140
+  #define WING_DOWN 40
+  #define WING_CENTER 90
+
   // ========= nRF24 =====================
   enum PipeID { REMODE = 0, PLANE = 1 };
   const byte pipeAddr[][6] = { "REM01" , "PLN01" };
 
   RF24 radio_Sent(CE_TX, CSN_TX);
   RF24 radio_Receive(CE_RX, CSN_RX);
+  RemoteData rxData; // ตัวแปรเก็บข้อมูลที่รับมา
+  PlaneData txData;  // ตัวแปรเก็บข้อมูลที่จะส่ง
   // ========= nRF24 =====================
 
   //===========MPU6050===================
@@ -45,8 +57,13 @@
   BH1750 light_Meter;
   //===========BH1750====================
 
-  RemoteData rxData; // ตัวแปรเก็บข้อมูลที่รับมา
-  PlaneData txData;  // ตัวแปรเก็บข้อมูลที่จะส่ง
+  //===========SERVO====================
+  Servo roll_Left_Servo;
+  Servo roll_Right_Servo;
+  Servo pitch_Servo;
+  Servo yaw_Servo;
+  Servo thrust_BLDC;
+  //===========SERVO====================
 
   void setup()
   {
@@ -73,10 +90,30 @@
     mpu.begin();                        // เริ่มต้น MPU6050
     mpu.calcGyroOffsets(true);         // คาลิเบรต gyro ตอนเครื่องอยู่นิ่ง
 
+
+
     // ---------------- ADC สำหรับ GUVA ----------------
     analogSetPinAttenuation(GUVA_PIN, ADC_11db);  // ให้ ADC อ่านได้ช่วง ~0–3.3V
     analogSetPinAttenuation(BAT_PIN, ADC_11db);
     analogReadResolution(12);                     // ตั้ง ADC เป็น 12-bit (0–4095)
+
+    // ---------------- Servo-------- ----------------
+    // --------- SERVO ATTACH ----------
+    roll_Left_Servo.attach(ROLL_LEFT_SERVO_PIN);
+    roll_Right_Servo.attach(ROLL_RIGHT_SERVO_PIN);
+    pitch_Servo.attach(PITCH_SERVO_PIN);
+    yaw_Servo.attach(YAW_SERVO_PIN);
+    thrust_BLDC.attach(THRUST_PIN, 1000, 2000);  // ESC BLDC ช่วง 1000–2000 µs
+
+    // ให้ทุกตัวอยู่กลาง 90 องศา
+    roll_Left_Servo.write(WING_CENTER);
+    roll_Right_Servo.write(WING_CENTER);
+    pitch_Servo.write(WING_CENTER);
+    yaw_Servo.write(WING_CENTER);
+
+    // เริ่มต้น thrust ต่ำสุด (เพื่อ arm ESC ให้ปลอดภัย)
+    thrust_BLDC.writeMicroseconds(0);
+    delay(3000);  // รอ ESC ติ๊ด ๆ จบก่อน
 
     // ---------------- Radio Receive ----------------
     radio_Receive.begin();              // เริ่มต้นโมดูลฝั่งรับ
@@ -99,7 +136,7 @@
     Serial.println("System Ready...");
   }
 
-  long timer1 = 0;
+  long timer1 = 0;//ใช้ส่งทุก 2 วินาที
   void loop()
   {
     if (millis() - timer1 > 2000)
@@ -155,6 +192,11 @@
       // ================= ส่งข้อมูล =================
       // ส่งที่ pipe "PLN01"
       sent_Plane_Data(txData, pipeAddr[PLANE]);
+    }
+
+    if (receive_Remote_Packet(rxData))
+    {
+        Control_Surfaces();
     }
   }
 
