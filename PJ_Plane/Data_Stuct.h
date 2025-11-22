@@ -88,7 +88,7 @@ struct BMP280_DHT_Data {
 // ===================== Utilities =====================
 //
 
-typedef float (*ReadFunc)();   // ฟังก์ชัน pointer สำหรับฟังก์ชันที่คืนค่า float และไม่รับพารามิเตอร์
+typedef float (*ReadFunc)(int);   // ฟังก์ชัน pointer สำหรับฟังก์ชันที่คืนค่า float และไม่รับพารามิเตอร์
 
 // constexpr เป็น const ที่คำนวณตั้งแต่ตอน compile
 constexpr size_t planeData_Size  = sizeof(PlaneData);   // ใช้เวลา radio.write / checksum
@@ -114,3 +114,4 @@ float readPitch();
 float readYaw();
 
 #endif
+
