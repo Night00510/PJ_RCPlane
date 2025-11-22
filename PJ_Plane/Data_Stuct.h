@@ -109,10 +109,12 @@ GUVA_BH1750     read_UV_BH1750(byte pin, bool debug = false);
 // float readBH1750(bool debug = false);  // ถ้าจะใช้แยกเฉพาะ BH1750
 
 float avgRead(ReadFunc func, int n);
+float avgRead_Pin(ReadFuncPin func_Pin, int n);
 float readRoll();
 float readPitch();
 float readYaw();
 
 #endif
+
 
 
