@@ -6,29 +6,29 @@
   #include <DHT.h>
   #include <BH1750.h>
   #include <ESP32Servo.h>
-  #include "Data_Stuct.h"   // <- แก้ชื่อไฟล์ให้ตรงกับจริง
+  #include "Data_Struct.h"
 
   #define CE_TX  4    // ขาส่ง
   #define CSN_TX 5    // ขาส่ง
   #define CE_RX  16   // ขารับ
   #define CSN_RX 17   // ขารับ
 
-  #define DHT_PIN 2
+  #define DHT_PIN  2
   #define DHT_TYPE DHT22
 
   #define GUVA_PIN 32
-  #define BAT_PIN 33
-  #define R1 47.0   // 47kΩ
-  #define R2 10.0   // 10kΩ
+  #define BAT_PIN  33
+  #define R1       47.0   // 47kΩ
+  #define R2       10.0   // 10kΩ
 
-  #define ROLL_LEFT_SERVO_PIN 12   // Servo ปีกช้าย
-  #define ROLL_RIGHT_SERVO_PIN 13  // Servo ปีกขวา
-  #define PITCH_SERVO_PIN 14       // Servo pitch
-  #define YAW_SERVO_PIN 25         // Servo yaw
-  #define THRUST_PIN 26            // BLDE thust
-  #define WING_UP 140
-  #define WING_DOWN 40
-  #define WING_CENTER 90
+  #define ROLL_LEFT_SERVO_PIN   12   // Servo ปีกช้าย
+  #define ROLL_RIGHT_SERVO_PIN  13   // Servo ปีกขวา
+  #define PITCH_SERVO_PIN       14   // Servo pitch
+  #define YAW_SERVO_PIN         25   // Servo yaw
+  #define THRUST_PIN            26   // BLDE thust
+  #define WING_UP               140  // servo angle
+  #define WING_DOWN             40
+  #define WING_CENTER           90
 
   // ========= nRF24 =====================
   enum PipeID { REMODE = 0, PLANE = 1 };
@@ -67,6 +67,8 @@
 
   void setup()
   {
+    pinMode(GUVA_PIN, INPUT);
+    pinMode(BAT_PIN, INPUT);
     // ---------------- Serial ----------------
     Serial.begin(115200);              // เปิด Serial สำหรับ debug ดูค่าต่าง ๆ
 
@@ -76,7 +78,7 @@
 
     // ---------------- Sensors Init ----------------
     // BME280 (อุณหภูมิ, ความดัน, ความสูง)
-    if(!bme.begin(0x76)) {             // ที่อยู่ I2C ของ BME280 ของคุณคือ 0x76
+    if(!bme.begin(0x76)) {             // ที่อยู่ I2C ของ BME280 คือ 0x76
       Serial.println("BME280 not found!");
     }
 
@@ -93,9 +95,8 @@
 
 
     // ---------------- ADC สำหรับ GUVA ----------------
-    analogSetPinAttenuation(GUVA_PIN, ADC_11db);  // ให้ ADC อ่านได้ช่วง ~0–3.3V
-    analogSetPinAttenuation(BAT_PIN, ADC_11db);
-    analogReadResolution(12);                     // ตั้ง ADC เป็น 12-bit (0–4095)
+  analogReadResolution(12);        //  ตั้งADC 12 bit(0–4095)
+  analogSetAttenuation(ADC_11db);  // รองรับ ~0–3.3V
 
     // ---------------- Servo-------- ----------------
     // --------- SERVO ATTACH ----------
@@ -115,22 +116,7 @@
     thrust_BLDC.writeMicroseconds(0);
     delay(3000);  // รอ ESC ติ๊ด ๆ จบก่อน
 
-    // ---------------- Radio Receive ----------------
-    radio_Receive.begin();              // เริ่มต้นโมดูลฝั่งรับ
-    radio_Receive.setPALevel(RF24_PA_MAX);   // กำลังรับ/ส่งสูงสุด
-    radio_Receive.setDataRate(RF24_250KBPS); // ลด data rate ให้ไกลขึ้น
-    radio_Receive.setChannel(100);           // เลี่ยงชน WiFi
-
-    // เปิดรับจาก pipe ของรีโมท "REM01"
-    radio_Receive.openReadingPipe(0, pipeAddr[REMODE]);
-    radio_Receive.startListening();     // เข้าสู่โหมดรับ
-
-    // ---------------- Radio Send ----------------
-    radio_Sent.begin();                // เริ่มต้นโมดูลฝั่งส่ง
-    radio_Sent.setPALevel(RF24_PA_MAX);      // กำลังส่งสูงสุด
-    radio_Sent.setDataRate(RF24_250KBPS);    // ลด data rate เพื่อเพิ่มระยะ
-    radio_Sent.setChannel(100);              // ต้องตรงกับฝั่งรับ
-    radio_Sent.setRetries(5, 5);             // ตั้ง retry เวลาแพ็กเก็ตหลุด setRetries( delay, count ) รอ 5 × 250µs = 1250µs จะลองใหม่ สูงสุด 5 ครั้ง
+    setupNRF24(); //เปิดnRF24
 
     // ---------------- System Ready ----------------
     Serial.println("System Ready...");
@@ -191,7 +177,7 @@
 
       // ================= ส่งข้อมูล =================
       // ส่งที่ pipe "PLN01"
-      sent_Plane_Data(txData, pipeAddr[PLANE]);
+      sent_Plane_Data(txData);
     }
 
     if (receive_Remote_Packet(rxData))
