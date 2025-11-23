@@ -1,6 +1,6 @@
-#define BLYNK_TEMPLATE_ID "xxx"
-#define BLYNK_TEMPLATE_NAME "xxx"
-#define BLYNK_AUTH_TOKEN "xxx"
+#define BLYNK_TEMPLATE_ID "TMPL63iUfewUj"
+#define BLYNK_TEMPLATE_NAME "PJ RCPlane"
+#define BLYNK_AUTH_TOKEN "bk5L47VYcYUsof06JqM3myUNWNp-CoEm"
 
 #include <Arduino.h>   // ปกติ include ให้อยู่แล้ว แต่ใส่ไว้ไม่เสียหาย
 #include <stdint.h>    // สำหรับ int8_t, uint8_t
@@ -24,8 +24,8 @@
 #define deadzone     400  // ตั้งเดดโซน (ใช้ใน digitalAxis)
 
 //WiFi
-const char ssid[] = "xxx";
-const char pass[] = "xxx";
+const char ssid[] = "AP_net";
+const char pass[] = "apao.3994";
 
 // กำหนดค่าเริ่มต้น (กันพลาดก่อนคาลิเบรต)
 int center_X_Roll  = 2048;
@@ -70,7 +70,6 @@ void setup()
 }
 
 long timer1 = 0;
-
 void loop()
 {
   Blynk.run();

@@ -141,8 +141,8 @@ void setupNRF24()
   radio_Receive.setDataRate(RF24_250KBPS);
 
   // ตั้งช่อง (2.4GHz + channel/100) เช่น 2.508 GHz
-  radio_Sent.setChannel(108);
-  radio_Receive.setChannel(108);
+  radio_Sent.setChannel(30);
+  radio_Receive.setChannel(25);
 
   // Auto-Ack และ retries เวลาส่งไม่ติด
   radio_Sent.setAutoAck(false);
