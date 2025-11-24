@@ -26,6 +26,7 @@
   #define PITCH_SERVO_PIN       14   // Servo pitch
   #define YAW_SERVO_PIN         25   // Servo yaw
   #define THRUST_PIN            26   // BLDE thust
+
   #define WING_UP               140  // servo angle
   #define WING_DOWN             40
   #define WING_CENTER           90
