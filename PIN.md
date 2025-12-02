@@ -1,4 +1,4 @@
-# nRF24L0 PA LNA Pin
+# nRF24L0 PA LNA Pin รับส่งต่อเหมือนกัน
 - nRF ตัวส่ง
   - CE → pin 4
   - CSN → pin 5
