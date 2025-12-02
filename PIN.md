@@ -1,3 +1,5 @@
+# PLANE
+
 # nRF24L0 PA LNA Pin รับส่งต่อเหมือนกัน
 - nRF ตัวส่ง
   - CE → pin 4
@@ -43,4 +45,13 @@
 - PITCH_SERVO_PIN       14   // Servo pitch
 - YAW_SERVO_PIN         25
 - THRUST_PIN            26
+
+# ----------------------------------------------
+#REMOTE
+
+#join stik
+- XPIN_ROLL    34
+- YPIN_PITCH   35
+- ZPIN_YAW     32
+- PIN_THRUST   33
    
