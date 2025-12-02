@@ -47,9 +47,9 @@
 - THRUST_PIN            26
 
 # ----------------------------------------------
-#REMOTE
+# REMOTE
 
-#join stik
+# join stik
 - XPIN_ROLL    34
 - YPIN_PITCH   35
 - ZPIN_YAW     32
