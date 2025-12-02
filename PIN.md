@@ -2,7 +2,7 @@
 - nRF ตัวส่ง
   - CE → pin 4
   - CSN → pin 5
-  - SCK → SCK (เช่น GPIO18 บน ESP32)
+  - SCK → SCK (GPIO18)
   - MOSI → MOSI (GPIO23)
   - MISO → MISO (GPIO19)
   - VCC → 3.3V
